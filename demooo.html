@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Guide: Signature Matching Project</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals (Background: #f5f5f4 Stone 100, Text: #292524 Zinc 800, Primary Accent: #60a5fa Blue 400, Secondary Accent: #fb923c Orange 400) -->
+    <!-- Application Structure Plan: The application transforms the linear tutorial into an interactive dashboard. A sticky top navigation bar (Overview, Setup, Code, Run, Interview) allows non-linear exploration. The structure uses themed sections with interactive components like checklists for prerequisites, tabbed views for code exploration (with copy-to-clipboard functionality), and accordion-style reveals for interview tips. This task-oriented, dashboard-like structure was chosen to make the dense instructional content more digestible, engaging, and user-friendly than a simple long-form document, allowing users to quickly jump to the section they need. -->
+    <!-- Visualization & Content Choices: 1. Tech Stack (Report Info) -> Goal: Inform -> Viz: Donut Chart -> Interaction: Hover for details -> Justification: Provides a quick, visual summary of the project's technologies, more engaging than a simple list -> Library: Chart.js/Canvas. 2. Project Steps (Report Info) -> Goal: Organize -> Viz: Interactive Step-by-Step Guide -> Interaction: Click to reveal next step -> Justification: Breaks down complex setup instructions into manageable chunks, reducing cognitive load -> Library/Method: HTML/CSS/JS. 3. Code Files (Report Info) -> Goal: Inform -> Viz: Tabbed Code Viewer -> Interaction: Click tabs to switch files, click button to copy code -> Justification: Organizes all code snippets logically and improves usability with a copy function -> Library/Method: HTML/CSS/JS. 4. Interview Points (Report Info) -> Goal: Inform/Organize -> Viz: Accordion/Collapsible List -> Interaction: Click to expand/collapse -> Justification: Presents Q&A content in a clean, interactive format that encourages active learning -> Library/Method: HTML/CSS/JS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4;
+            color: #292524;
+        }
+        .nav-link {
+            transition: color 0.3s, border-color 0.3s;
+            border-bottom-width: 2px;
+            border-color: transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #60a5fa;
+            border-color: #60a5fa;
+        }
+        .code-block {
+            background-color: #292524;
+            color: #f5f5f4;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            position: relative;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: #57534e;
+            color: #e7e5e4;
+            border: none;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .copy-btn:hover {
+            background-color: #78716c;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+         @media (min-width: 768px) { .chart-container { height: 350px; } }
+        .tab-btn.active {
+            background-color: #60a5fa;
+            color: white;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .step-content { display: none; }
+        .step-content.active { display: block; }
+    </style>
+</head>
+<body class="bg-stone-100 text-zinc-800">
+
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-zinc-800">Signature Matcher Guide</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#overview" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Overview</a>
+                        <a href="#setup" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Setup</a>
+                        <a href="#code" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Code</a>
+                        <a href="#run" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Run</a>
+                        <a href="#interview" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Interview Prep</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <section id="overview" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-extrabold text-zinc-900 sm:text-5xl">Signature Matching Simulation</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-xl text-zinc-600">An interactive guide to building a Java Servlet web application from scratch.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-bold">Project Goal</h3>
+                    <p class="text-lg text-zinc-700">This guide breaks down the process of creating a simple yet functional web application that simulates signature matching. You will learn to build a system where users can input two text-based "signatures" and receive a comparison result—whether they are an exact match, potentially similar, or different. It's a foundational project for understanding core web development concepts.</p>
+                    <h3 class="text-2xl font-bold">Key Technologies</h3>
+                    <p class="text-lg text-zinc-700">The application is built on a standard Java web stack, providing excellent practice with enterprise-level tools. This includes Java Servlets for backend logic, JSP for the frontend presentation, Maven for project management, and Apache Tomcat as the web server.</p>
+                </div>
+                <div>
+                     <div class="chart-container">
+                        <canvas id="techStackChart"></canvas>
+                    </div>
+                    <p class="text-center mt-2 text-sm text-zinc-500">Hover over the chart to see the technology distribution.</p>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-12 border-stone-300">
+
+        <section id="setup" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-extrabold text-zinc-900">Interactive Setup Guide</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-xl text-zinc-600">Follow these steps to prepare your environment and create the project structure. Click each step to reveal the details.</p>
+            </div>
+            
+            <div class="max-w-4xl mx-auto space-y-4">
+                <div class="bg-white rounded-lg shadow-md">
+                    <button class="accordion-btn flex justify-between items-center w-full p-6 text-left font-semibold text-xl">
+                        <span>Step 1: System Prerequisites</span>
+                        <span class="transform transition-transform duration-300">▼</span>
+                    </button>
+                    <div class="accordion-content px-6 pb-6">
+                        <ul class="list-disc list-inside space-y-3 text-zinc-700">
+                            <li><b>Java Development Kit (JDK):</b> Version 8 or higher. Verify with <code>java -version</code>.</li>
+                            <li><b>Apache Maven:</b> Version 3.6 or higher. Verify with <code>mvn -v</code>.</li>
+                            <li><b>Apache Tomcat:</b> Version 9 or higher. No installation needed, just extract the folder.</li>
+                            <li><b>Visual Studio Code:</b> With the "Extension Pack for Java" installed.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md">
+                    <button class="accordion-btn flex justify-between items-center w-full p-6 text-left font-semibold text-xl">
+                        <span>Step 2: Create Project with Maven</span>
+                         <span class="transform transition-transform duration-300">▼</span>
+                    </button>
+                    <div class="accordion-content px-6 pb-6">
+                       <p class="text-zinc-700 mb-4">Open your terminal and run this command to generate the project skeleton:</p>
+                       <div class="code-block">
+                           <pre><code>mvn archetype:generate -DgroupId=com.example.sigmatch -DartifactId=signature-matching-app -DarchetypeArtifactId=maven-archetype-webapp -DinteractiveMode=false</code></pre>
+                           <button class="copy-btn" data-clipboard-target="prev">Copy</button>
+                       </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md">
+                    <button class="accordion-btn flex justify-between items-center w-full p-6 text-left font-semibold text-xl">
+                        <span>Step 3: Open in VS Code</span>
+                         <span class="transform transition-transform duration-300">▼</span>
+                    </button>
+                     <div class="accordion-content px-6 pb-6">
+                        <p class="text-zinc-700 mb-4">Navigate into the new directory and open it with VS Code:</p>
+                        <div class="code-block">
+                           <pre><code>cd signature-matching-app
+code .</code></pre>
+                            <button class="copy-btn" data-clipboard-target="prev">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-12 border-stone-300">
+
+        <section id="code" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-extrabold text-zinc-900">Code Explorer</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-xl text-zinc-600">Here are all the necessary code files for the project. Use the tabs to switch between files and the copy button to grab the code.</p>
+            </div>
+            <div class="max-w-5xl mx-auto">
+                <div class="mb-4 flex space-x-2 p-1 bg-stone-200 rounded-lg">
+                    <button class="tab-btn flex-1 p-3 rounded-md font-semibold transition active" data-tab="pom">pom.xml</button>
+                    <button class="tab-btn flex-1 p-3 rounded-md font-semibold transition" data-tab="servlet">SignatureServlet.java</button>
+                    <button class="tab-btn flex-1 p-3 rounded-md font-semibold transition" data-tab="webxml">web.xml</button>
+                    <button class="tab-btn flex-1 p-3 rounded-md font-semibold transition" data-tab="jsp">index.jsp</button>
+                </div>
+                
+                <div id="tab-content" class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="tab-pane active" id="pane-pom">
+                        <div class="p-2 sm:p-4">
+                          <p class="text-zinc-600 text-sm mb-2 px-4">Location: <code>/pom.xml</code> (Project Root)</p>
+                          <div class="code-block">
+<pre><code id="code-pom">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+    &lt;groupId&gt;com.example.sigmatch&lt;/groupId&gt;
+    &lt;artifactId&gt;signature-matching-app&lt;/artifactId&gt;
+    &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
+    &lt;packaging&gt;war&lt;/packaging&gt;
+    &lt;name&gt;SignatureMatchingApp&lt;/name&gt;
+    &lt;properties&gt;
+        &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+        &lt;maven.compiler.source&gt;1.8&lt;/maven.compiler.source&gt;
+        &lt;maven.compiler.target&gt;1.8&lt;/maven.compiler.target&gt;
+        &lt;servlet.api.version&gt;4.0.1&lt;/servlet.api.version&gt;
+    &lt;/properties&gt;
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;javax.servlet&lt;/groupId&gt;
+            &lt;artifactId&gt;javax.servlet-api&lt;/artifactId&gt;
+            &lt;version&gt;${servlet.api.version}&lt;/version&gt;
+            &lt;scope&gt;provided&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+    &lt;build&gt;
+        &lt;finalName&gt;signature-matching-app&lt;/finalName&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+                &lt;version&gt;3.8.1&lt;/version&gt;
+            &lt;/plugin&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                &lt;artifactId&gt;maven-war-plugin&lt;/artifactId&gt;
+                &lt;version&gt;3.3.2&lt;/version&gt;
+                &lt;configuration&gt;
+                    &lt;failOnMissingWebXml&gt;false&lt;/failOnMissingWebXml&gt;
+                &lt;/configuration&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+&lt;/project&gt;</code></pre>
+                              <button class="copy-btn" data-clipboard-target="#code-pom">Copy</button>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane hidden" id="pane-servlet">
+                        <div class="p-2 sm:p-4">
+                          <p class="text-zinc-600 text-sm mb-2 px-4">Location: <code>/src/main/java/com/example/sigmatch/SignatureServlet.java</code></p>
+                          <div class="code-block">
+<pre><code id="code-servlet">package com.example.sigmatch;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+@WebServlet("/matchSignature")
+public class SignatureServlet extends HttpServlet {
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String signature1 = request.getParameter("signature1");
+        String signature2 = request.getParameter("signature2");
+        String matchResult;
+
+        if (signature1 == null || signature1.trim().isEmpty() ||
+            signature2 == null || signature2.trim().isEmpty()) {
+            matchResult = "Please provide both signatures for comparison.";
+        } else {
+            boolean isExactMatch = signature1.equals(signature2);
+            boolean isSimilar = false;
+            if (!isExactMatch) {
+                double lengthRatio = (double) Math.min(signature1.length(), signature2.length()) /
+                                     Math.max(signature1.length(), signature2.length());
+                if (lengthRatio > 0.8) {
+                    isSimilar = true;
+                }
+            }
+
+            if (isExactMatch) {
+                matchResult = "Signatures are an **EXACT MATCH**!";
+            } else if (isSimilar) {
+                matchResult = "Signatures are **POTENTIALLY SIMILAR** (not exact match).";
+            } else {
+                matchResult = "Signatures are **DIFFERENT**.";
+            }
+        }
+        request.setAttribute("matchResult", matchResult);
+        request.setAttribute("sig1", signature1);
+        request.setAttribute("sig2", signature2);
+        request.getRequestDispatcher("/index.jsp").forward(request, response);
+    }
+}</code></pre>
+                            <button class="copy-btn" data-clipboard-target="#code-servlet">Copy</button>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane hidden" id="pane-webxml">
+                         <div class="p-2 sm:p-4">
+                          <p class="text-zinc-600 text-sm mb-2 px-4">Location: <code>/src/main/webapp/WEB-INF/web.xml</code></p>
+                          <div class="code-block">
+<pre><code id="code-webxml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0"&gt;
+    &lt;display-name&gt;SignatureMatchingApp&lt;/display-name&gt;
+    &lt;welcome-file-list&gt;
+        &lt;welcome-file&gt;index.jsp&lt;/welcome-file&gt;
+    &lt;/welcome-file-list&gt;
+&lt;/web-app&gt;</code></pre>
+                            <button class="copy-btn" data-clipboard-target="#code-webxml">Copy</button>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane hidden" id="pane-jsp">
+                         <div class="p-2 sm:p-4">
+                           <p class="text-zinc-600 text-sm mb-2 px-4">Location: <code>/src/main/webapp/index.jsp</code></p>
+                          <div class="code-block">
+<pre><code id="code-jsp">&lt;%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;Signature Matching Simulation&lt;/title&gt;
+    &lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body class="bg-gray-100"&gt;
+    &lt;div class="container mx-auto p-8 bg-white rounded-xl shadow-lg mt-10 max-w-2xl"&gt;
+        &lt;h1 class="text-3xl font-bold text-center text-gray-800 mb-6"&gt;Signature Matching Simulator&lt;/h1&gt;
+        &lt;form action="matchSignature" method="post" class="space-y-4"&gt;
+            &lt;div&gt;
+                &lt;label for="signature1" class="block text-sm font-medium text-gray-700"&gt;Signature 1:&lt;/label&gt;
+                &lt;textarea id="signature1" name="signature1" rows="4"
+                          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"&gt;&lt;%= request.getAttribute("sig1") != null ? request.getAttribute("sig1") : "" %&gt;&lt;/textarea&gt;
+            &lt;/div&gt;
+            &lt;div&gt;
+                &lt;label for="signature2" class="block text-sm font-medium text-gray-700"&gt;Signature 2:&lt;/label&gt;
+                &lt;textarea id="signature2" name="signature2" rows="4"
+                          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"&gt;&lt;%= request.getAttribute("sig2") != null ? request.getAttribute("sig2") : "" %&gt;&lt;/textarea&gt;
+            &lt;/div&gt;
+            &lt;div class="flex justify-center"&gt;
+                &lt;button type="submit"
+                        class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700"&gt;
+                    Compare Signatures
+                &lt;/button&gt;
+            &lt;/div&gt;
+        &lt;/form&gt;
+        &lt;%
+            String matchResult = (String) request.getAttribute("matchResult");
+            if (matchResult != null) {
+        %&gt;
+            &lt;div class="mt-8 p-4 rounded-lg text-center font-bold 
+                &lt;% if (matchResult.contains("EXACT")) { out.print("bg-green-100 text-green-800"); }
+                   else if (matchResult.contains("SIMILAR")) { out.print("bg-yellow-100 text-yellow-800"); }
+                   else { out.print("bg-red-100 text-red-800"); } %&gt;"&gt;
+                &lt;p&gt;&lt;%= matchResult %&gt;&lt;/p&gt;
+            &lt;/div&gt;
+        &lt;% } %&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                            <button class="copy-btn" data-clipboard-target="#code-jsp">Copy</button>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-12 border-stone-300">
+        
+        <section id="run" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-extrabold text-zinc-900">Build & Run</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-xl text-zinc-600">A step-by-step guide to compiling, deploying, and running your new application.</p>
+            </div>
+            <div id="step-by-step-runner" class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8">
+                <div class="relative mb-8">
+                    <div class="absolute left-0 top-0 h-full w-1 bg-stone-200 rounded"></div>
+                    <div id="progress-bar" class="absolute left-0 top-0 h-full w-1 bg-blue-400 rounded transition-all duration-500" style="height: 25%;"></div>
+                    <div class="space-y-8">
+                        <div class="pl-8 relative">
+                           <div class="absolute -left-3 top-1 w-7 h-7 bg-blue-400 rounded-full border-4 border-white"></div>
+                           <h4 class="font-bold text-lg">Step 1: Build the WAR File</h4>
+                        </div>
+                         <div class="pl-8 relative">
+                           <div class="absolute -left-3 top-1 w-7 h-7 bg-stone-300 rounded-full border-4 border-white"></div>
+                           <h4 class="font-bold text-lg text-stone-500">Step 2: Deploy to Tomcat</h4>
+                        </div>
+                         <div class="pl-8 relative">
+                            <div class="absolute -left-3 top-1 w-7 h-7 bg-stone-300 rounded-full border-4 border-white"></div>
+                           <h4 class="font-bold text-lg text-stone-500">Step 3: Start Tomcat Server</h4>
+                        </div>
+                         <div class="pl-8 relative">
+                            <div class="absolute -left-3 top-1 w-7 h-7 bg-stone-300 rounded-full border-4 border-white"></div>
+                           <h4 class="font-bold text-lg text-stone-500">Step 4: Access Application</h4>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="runner-content">
+                    <div class="step-content active">
+                        <h3 class="font-bold text-2xl mb-4">Step 1: Build the WAR File</h3>
+                        <p class="text-zinc-700 mb-4">From the project's root directory, run the Maven `clean install` command. This will compile your code and package it into a distributable `.war` file inside the `/target` directory.</p>
+                        <div class="code-block">
+                           <pre><code>mvn clean install</code></pre>
+                           <button class="copy-btn" data-clipboard-target="prev">Copy</button>
+                        </div>
+                    </div>
+                    <div class="step-content">
+                        <h3 class="font-bold text-2xl mb-4">Step 2: Deploy to Tomcat</h3>
+                        <p class="text-zinc-700">Copy the generated <code>signature-matching-app.war</code> file from your project's <code>/target</code> directory into the <code>/webapps</code> directory of your Apache Tomcat installation.</p>
+                    </div>
+                    <div class="step-content">
+                        <h3 class="font-bold text-2xl mb-4">Step 3: Start Tomcat Server</h3>
+                        <p class="text-zinc-700 mb-4">Navigate to the <code>/bin</code> directory of your Tomcat installation and run the startup script:</p>
+                         <ul class="list-disc list-inside space-y-2 text-zinc-700">
+                           <li><b>Windows:</b> Run <code>startup.bat</code></li>
+                           <li><b>macOS/Linux:</b> Run <code>./startup.sh</code></li>
+                        </ul>
+                    </div>
+                    <div class="step-content">
+                        <h3 class="font-bold text-2xl mb-4">Step 4: Access Application</h3>
+                        <p class="text-zinc-700 mb-2">Once the server is running, open your browser and navigate to the following URL. You should see the live application.</p>
+                         <div class="code-block text-center text-lg">
+                           <pre><code>http://localhost:8080/signature-matching-app/</code></pre>
+                        </div>
+                    </div>
+                </div>
+                 <div class="mt-8 flex justify-between">
+                    <button id="prev-step-btn" class="px-6 py-2 bg-stone-300 text-zinc-800 font-semibold rounded-lg shadow-sm" disabled>Previous</button>
+                    <button id="next-step-btn" class="px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600">Next Step</button>
+                </div>
+            </div>
+        </section>
+        
+        <hr class="my-12 border-stone-300">
+
+        <section id="interview" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-extrabold text-zinc-900">Interview Prep</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-xl text-zinc-600">Key talking points to help you confidently present this project in an interview.</p>
+            </div>
+            
+            <div class="max-w-4xl mx-auto space-y-4">
+                 <div class="bg-white rounded-lg shadow-md">
+                    <button class="accordion-btn flex justify-between items-center w-full p-6 text-left font-semibold text-xl">
+                        <span>Project Architecture & Tech</span>
+                        <span class="transform transition-transform duration-300">▼</span>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-zinc-700 space-y-2">
+                        <p>Explain the client-server model. The frontend (JSP) gathers user input, which is sent to the backend (Java Servlet). The Servlet processes the data and sends a result back to the JSP for display. Emphasize the use of Maven for managing dependencies/builds and Tomcat as the runtime environment.</p>
+                    </div>
+                </div>
+                 <div class="bg-white rounded-lg shadow-md">
+                    <button class="accordion-btn flex justify-between items-center w-full p-6 text-left font-semibold text-xl">
+                        <span>Core Logic Explained</span>
+                        <span class="transform transition-transform duration-300">▼</span>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-zinc-700 space-y-2">
+                        <p>Describe how the `doPost` method in the Servlet is the entry point for form submissions. Detail the string comparison logic: first an exact match check (`.equals()`), followed by a simple similarity heuristic based on the length ratio of the two strings. Explain that `request.setAttribute()` is used to pass data from the servlet back to the JSP.</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md">
+                    <button class="accordion-btn flex justify-between items-center w-full p-6 text-left font-semibold text-xl">
+                        <span>Potential Future Enhancements</span>
+                        <span class="transform transition-transform duration-300">▼</span>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-zinc-700 space-y-3">
+                         <ul class="list-disc list-inside space-y-2">
+                            <li><b>Real Image Processing:</b> "I would integrate a library like OpenCV to analyze actual signature images, extract geometric features, and build a more robust matching model."</li>
+                            <li><b>Advanced Algorithms:</b> "For text, I'd implement Levenshtein distance for a more accurate similarity score."</li>
+                             <li><b>Database Integration:</b> "The next logical step is to store signature templates in a database (like PostgreSQL) to compare new signatures against a saved record."</li>
+                            <li><b>API & UI:</b> "I would separate the frontend and backend by creating a RESTful API and building the UI with a modern JavaScript framework like React or Vue.js."</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Tech Stack Chart
+            const ctx = document.getElementById('techStackChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Java / Servlets', 'JSP / Frontend', 'Maven', 'Tomcat'],
+                    datasets: [{
+                        label: 'Tech Stack',
+                        data: [40, 30, 15, 15],
+                        backgroundColor: [
+                            'rgba(96, 165, 250, 0.8)', // blue-400
+                            'rgba(251, 146, 60, 0.8)', // orange-400
+                            'rgba(168, 162, 158, 0.8)', // stone-400
+                            'rgba(120, 113, 108, 0.8)'  // stone-500
+                        ],
+                        borderColor: [
+                            '#60a5fa',
+                            '#fb923c',
+                            '#a8a29e',
+                            '#78716c'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Project Technology Breakdown',
+                            font: { size: 16 }
+                        }
+                    }
+                }
+            });
+            
+            // Accordion Logic
+            const accordionBtns = document.querySelectorAll('.accordion-btn');
+            accordionBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const content = btn.nextElementSibling;
+                    const icon = btn.querySelector('span:last-child');
+                    btn.classList.toggle('active');
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+
+            // Code Tabs Logic
+            const tabContainer = document.querySelector('#code');
+            const tabButtons = tabContainer.querySelectorAll('.tab-btn');
+            const tabPanes = tabContainer.querySelectorAll('.tab-pane');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    tabPanes.forEach(pane => pane.classList.add('hidden'));
+                    const targetPane = document.getElementById(`pane-${button.dataset.tab}`);
+                    targetPane.classList.remove('hidden');
+                });
+            });
+            
+            // Clipboard Copy Logic
+            document.querySelectorAll('.copy-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const targetSelector = e.target.dataset.clipboardTarget;
+                    const targetElement = e.target.matches('[data-clipboard-target="prev"]') ? e.target.previousElementSibling : document.querySelector(targetSelector);
+                    
+                    if (targetElement) {
+                        const textToCopy = targetElement.innerText;
+                        
+                        const tempTextArea = document.createElement('textarea');
+                        tempTextArea.value = textToCopy;
+                        document.body.appendChild(tempTextArea);
+                        tempTextArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(tempTextArea);
+
+                        const originalText = button.textContent;
+                        button.textContent = 'Copied!';
+                        setTimeout(() => {
+                            button.textContent = originalText;
+                        }, 2000);
+                    }
+                });
+            });
+
+            // Step-by-step Runner Logic
+            const runner = document.getElementById('step-by-step-runner');
+            const stepContents = runner.querySelectorAll('.step-content');
+            const timelinePoints = runner.querySelectorAll('.relative .absolute');
+            const progressBar = runner.querySelector('#progress-bar');
+            const prevBtn = runner.querySelector('#prev-step-btn');
+            const nextBtn = runner.querySelector('#next-step-btn');
+            let currentStep = 0;
+
+            function updateRunnerView() {
+                stepContents.forEach((content, index) => {
+                    content.classList.toggle('active', index === currentStep);
+                });
+
+                // Update timeline dots
+                timelinePoints.forEach((point, index) => {
+                    if (index < stepContents.length) { // Ensure we only target step dots
+                        point.classList.toggle('bg-blue-400', index <= currentStep);
+                        point.classList.toggle('bg-stone-300', index > currentStep);
+                    }
+                });
+                
+                // Update progress bar
+                progressBar.style.height = `${(currentStep / (stepContents.length - 1)) * 100}%`;
+
+                prevBtn.disabled = currentStep === 0;
+                nextBtn.disabled = currentStep === stepContents.length - 1;
+                nextBtn.textContent = currentStep === stepContents.length - 1 ? 'Finished!' : 'Next Step';
+            }
+
+            nextBtn.addEventListener('click', () => {
+                if (currentStep < stepContents.length - 1) {
+                    currentStep++;
+                    updateRunnerView();
+                }
+            });
+
+            prevBtn.addEventListener('click', () => {
+                if (currentStep > 0) {
+                    currentStep--;
+                    updateRunnerView();
+                }
+            });
+            
+            updateRunnerView();
+        });
+    </script>
+</body>
+</html>
